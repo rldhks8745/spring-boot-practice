@@ -1,7 +1,7 @@
 spring:
-  datasource:    hikari:
-      driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: jdbc:mariadb://localhost:3306/test?characterEncoding=UTF-8&serverTimezone=UTC
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/test?characterEncoding=UTF-8&serverTimezone=UTC    hikari:
       username: root
       password: root      maximum-pool-size: 4
       connection-test-query: SELECT 1

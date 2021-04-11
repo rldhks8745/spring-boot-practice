@@ -5,27 +5,26 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableConfigurationProperties(MybatisProperties.class)
 public class MybatisConfig {
-	
-	@Autowired
-	private MybatisInterceptor mybatisInterceptor;
-	
+		
 	@Bean
-	public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+	public SqlSessionFactory sqlSessionFactory(DataSource dataSource, MybatisProperties properties) throws Exception {
 		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
 		sqlSessionFactoryBean.setDataSource(dataSource);
-		sqlSessionFactoryBean.setPlugins(mybatisInterceptor);
+		sqlSessionFactoryBean.setConfiguration(properties.getConfiguration());
+		sqlSessionFactoryBean.setPlugins(new MybatisInterceptor());
 		return sqlSessionFactoryBean.getObject();
 	}
 
 	@Bean
 	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
-		sqlSessionFactory.getConfiguration().setMapUnderscoreToCamelCase(true);
 		return new SqlSessionTemplate(sqlSessionFactory);
 	}
 }
