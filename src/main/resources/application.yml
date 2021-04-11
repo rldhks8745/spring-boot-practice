@@ -1,0 +1,10 @@
+spring:
+  datasource:    hikari:
+      driver-class-name: org.mariadb.jdbc.Driver
+      jdbc-url: jdbc:mariadb://localhost:3306/test?characterEncoding=UTF-8&serverTimezone=UTC
+      username: root
+      password: root      maximum-pool-size: 4
+      connection-test-query: SELECT 1
+      connection-timeout: 3000
+      
+mybatis:  configuration:    map-underscore-to-camel-case: true
