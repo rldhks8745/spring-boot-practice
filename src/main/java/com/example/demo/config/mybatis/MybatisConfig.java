@@ -9,6 +9,7 @@ import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.example.demo.config.mybatis.interceptor.MybatisInterceptor;
 
 @Configuration
 @EnableConfigurationProperties(MybatisProperties.class)
@@ -19,6 +20,7 @@ public class MybatisConfig {
 		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
 		sqlSessionFactoryBean.setDataSource(dataSource);
 		sqlSessionFactoryBean.setConfiguration(properties.getConfiguration());
+//		sqlSessionFactoryBean.setTypeHandlersPackage("com.example.demo.config.mybatis.handler.*");
 		sqlSessionFactoryBean.setPlugins(new MybatisInterceptor());
 		return sqlSessionFactoryBean.getObject();
 	}
