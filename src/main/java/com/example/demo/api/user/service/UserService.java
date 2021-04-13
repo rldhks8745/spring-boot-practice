@@ -10,21 +10,22 @@ import com.example.demo.config.mybatis.model.PagableResponse;
 
 @Service
 public class UserService {
-	
-	@Autowired
-	private UserMapper userMapper;
-	
-	public PagableResponse<User> selectUserList(UserRequest userRequest) {
-		return userMapper.selectUserList(userRequest);
-	}
 
-    public List<User> selectUserList2(UserRequest userRequest) {
-        return userMapper.selectUserList2(userRequest);
-    }
-    
-	public User selectOneUser(String id) {
-		User user = new User();
-		user.setId(id);
-		return userMapper.selectOneUser(id, 1);
-	}
+  @Autowired
+  private UserMapper userMapper;
+
+  public PagableResponse<User> selectUserList(UserRequest userRequest) {
+    PagableResponse<User> p = userMapper.selectUserList(userRequest);
+    return p;
+  }
+
+  public List<User> selectUserList2(UserRequest userRequest) {
+    return userMapper.selectUserList2(userRequest);
+  }
+
+  public User selectOneUser(String id) {
+    User user = new User();
+    user.setId(id);
+    return userMapper.selectOneUser(id, 1);
+  }
 }

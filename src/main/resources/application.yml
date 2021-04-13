@@ -8,3 +8,8 @@ spring:
       connection-timeout: 3000
       
 mybatis:  configuration:    map-underscore-to-camel-case: true
+    
+    
+logging:  level:
+    '[org.apache.ibatis]': DEBUG    '[com.example.demo]': DEBUG
+    
