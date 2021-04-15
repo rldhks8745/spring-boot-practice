@@ -1,100 +1,94 @@
 package com.example.demo.config.mybatis.interceptor;
 
-import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
-import org.apache.ibatis.reflection.DefaultReflectorFactory;
-import org.apache.ibatis.reflection.ReflectorFactory;
-import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
-import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
-import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
-import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
-import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import com.example.demo.config.mybatis.model.PagableResponse;
 import com.example.demo.config.mybatis.model.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Intercepts({@Signature(type = Executor.class, method = "query",
-args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
+    args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
 public class QueryInterceptor implements Interceptor {
 
-  @Override
-  public Object intercept(Invocation invocation) throws Throwable {
+  private List<ResultMap> createCountResultMaps(MappedStatement ms) {
+    List<ResultMap> countResultMaps = new ArrayList<>();
     
-    System.out.println("interceptor test");
-
-    MappedStatement ms = (MappedStatement) invocation.getArgs()[0];
-    Class<?> cls = ms.getParameterMap().getType();
-
-//    if (isInheritedPageInfo(cls)) {
-//      log.info("{}는 {}를 상속받고 있습니다.", cls, PageInfo.class);
-//
-//      PageInfo pageInfo = (PageInfo) invocation.getArgs()[1];
-//      RowBounds limitRowBounds = (RowBounds) invocation.getArgs()[2];
-//      DynamicSqlSource sqlSource = (DynamicSqlSource) ms.getSqlSource();
-//
-//      Field field = sqlSource.getClass().getDeclaredField("rootSqlNode");
-//      field.setAccessible(true);
-//      MixedSqlNode sqlNode = (MixedSqlNode) field.get(sqlSource);
-//
-//      field = sqlNode.getClass().getDeclaredField("contents");
-//      field.setAccessible(true);
-//      List contents = (List) field.get(sqlNode);
-//
-//      StaticTextSqlNode additionalPagingQuery = new StaticTextSqlNode(String.format("""
-//          \nLIMIT %d OFFSET %d
-//         """, pageInfo.getSize(), (pageInfo.getPage() - 1) * pageInfo.getSize()));
-//      
-//      if(!contents.get(contents.size()-1).equals(additionalPagingQuery)) {
-//        contents.add(additionalPagingQuery); 
-//      }
-//
-//      System.out.println("ddd");
-//    }
-
-//    RowBounds limitRowBounds = (RowBounds) invocation.getArgs()[2];
-
-    // invocation.getArgs()[3] = new PagableResponseResulthandler();
-
-    // PagableResponseResulthandler resultHandler = (PagableResponseResulthandler)
-    // invocation.getArgs()[3];
-    Object returnObject = invocation.proceed();
-
-//    try {
-//      RowBounds totalRowBounds = new RowBounds();
-//
-//      invocation.getArgs()[2] = totalRowBounds;
-//      List totalObject = (List) invocation.proceed();
-//      int totalCount = totalObject.size();
-//      log.info(totalCount + "");
-//    } catch (Exception e) {
-//      // List형식이 아니면 totalRowBounds가 필요없음
-//    }
-
-    return returnObject;
+    ResultMap countResultMap =
+        new ResultMap.Builder(ms.getConfiguration(), ms.getId()+"-Long", Long.class, new ArrayList<>())
+            .build();
+    countResultMaps.add(countResultMap);
+    
+    return countResultMaps;
   }
 
-  private boolean isInheritedPageInfo(Class<?> cls) {
-    while (true) {
-      Class<?> superCls = cls.getSuperclass();
-      if (Object.class.equals(superCls))
-        break;
+  private MappedStatement createCountMappedStatement(MappedStatement ms) {
+    List<ResultMap> countResultMaps = createCountResultMaps(ms);
+    
+     return new MappedStatement.Builder(ms.getConfiguration(), ms.getId()+"-Long",
+       ms.getSqlSource(), ms.getSqlCommandType())
+       .resource(ms.getResource())
+       .parameterMap(ms.getParameterMap())
+       .resultMaps(countResultMaps)
+       .fetchSize(ms.getFetchSize())
+       .timeout(ms.getTimeout())
+       .statementType(ms.getStatementType())
+       .resultSetType(ms.getResultSetType())
+       .cache(ms.getCache())
+       .flushCacheRequired(ms.isFlushCacheRequired())
+       .useCache(false) // Custom하게 만든거라 cache는 false
+       .resultOrdered(ms.isResultOrdered())
+       .keyGenerator(ms.getKeyGenerator())
+       .keyColumn(ms.getKeyColumns() != null ? String.join(",", ms.getKeyColumns()) : null)
+       .keyProperty(ms.getKeyProperties() != null ? String.join(",", ms.getKeyProperties()): null)
+       .databaseId(ms.getDatabaseId())
+       .lang(ms.getLang())
+       .resultSets(ms.getResultSets() != null ? String.join(",", ms.getResultSets()): null)
+     .build();
+  }
+  
+  private PagableResponse<Object> createPagableResponse(List<Object> list, PageInfo pageInfo) {
+    PagableResponse<Object> pagableResponse = new PagableResponse<>();
+    pagableResponse.setList(list);
+    pagableResponse.getPageInfo().setPage(pageInfo.getPage());
+    pagableResponse.getPageInfo().setSize(pageInfo.getSize());
+    pagableResponse.getPageInfo().setTotalCount(pageInfo.getTotalCount());
+    
+    return pagableResponse;
+  }
+  
+  @Override
+  public Object intercept(Invocation invocation) throws Throwable {
+    try {
+      PageInfo pageInfo = (PageInfo) invocation.getArgs()[2];
 
-      if (cls.getSuperclass().equals(PageInfo.class))
-        return true;
-      else
-        return isInheritedPageInfo(cls.getSuperclass());
+      MappedStatement oldMappedStatement = (MappedStatement) invocation.getArgs()[0];
+      MappedStatement newMappedStatement = createCountMappedStatement(oldMappedStatement);
+      
+      // COUNT 구하기
+      invocation.getArgs()[0] = newMappedStatement;
+      List<Number> totalCount = (List<Number>) invocation.proceed();
+      pageInfo.setTotalCount((Long) totalCount.get(0));
+
+      // LIST 구하기
+      invocation.getArgs()[0] = oldMappedStatement;
+      List<Object> list = (List<Object>) invocation.proceed();
+
+      return createPagableResponse(list, pageInfo);
+    } catch (ClassCastException e) {
+      log.debug("■■ QueryInterceptor Skip: Request Parameter가 PageInfo.class를 상속받지 않았습니다.■■");
     }
 
-    return false;
+    return invocation.proceed();
   }
 
 }
