@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 
@@ -21,7 +22,7 @@ import lombok.Data;
 
 @Data
 @JsonFormat(shape = Shape.OBJECT)
-public class PagableResponse<T> implements Collection<T> {
+public class PagableResponse<T> implements List<T> {
 
   private List<T> list;
   
@@ -37,6 +38,7 @@ public class PagableResponse<T> implements Collection<T> {
     return list.size();
   }
 
+  @JsonIgnore
   @Override
   public boolean isEmpty() {
     return list.isEmpty();
@@ -83,6 +85,11 @@ public class PagableResponse<T> implements Collection<T> {
   }
 
   @Override
+  public boolean addAll(int index, Collection<? extends T> c) {
+    return list.addAll(index, c);
+  }
+
+  @Override
   public boolean removeAll(Collection<?> c) {
     return removeAll(c);
   }
@@ -95,5 +102,50 @@ public class PagableResponse<T> implements Collection<T> {
   @Override
   public void clear() {
     list.clear();
+  }
+
+  @Override
+  public T get(int index) {
+    return list.get(index);
+  }
+
+  @Override
+  public T set(int index, T element) {
+    return list.set(index, element);
+  }
+
+  @Override
+  public void add(int index, T element) {
+    list.add(index, element);
+  }
+
+  @Override
+  public T remove(int index) {
+    return list.remove(index);
+  }
+
+  @Override
+  public int indexOf(Object o) {
+    return list.indexOf(o);
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
+    return list.lastIndexOf(o);
+  }
+
+  @Override
+  public ListIterator<T> listIterator() {
+    return list.listIterator();
+  }
+
+  @Override
+  public ListIterator<T> listIterator(int index) {
+    return list.listIterator(index);
+  }
+
+  @Override
+  public List<T> subList(int fromIndex, int toIndex) {
+    return list.subList(fromIndex, toIndex);
   }
 }
