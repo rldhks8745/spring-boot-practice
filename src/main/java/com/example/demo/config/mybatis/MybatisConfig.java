@@ -14,19 +14,20 @@ import com.example.demo.config.mybatis.interceptor.StatementInterceptor;
 @Configuration
 @EnableConfigurationProperties(MybatisProperties.class)
 public class MybatisConfig {
-		
-	@Bean
-	public SqlSessionFactory sqlSessionFactory(DataSource dataSource, MybatisProperties properties) throws Exception {
-		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-		sqlSessionFactoryBean.setDataSource(dataSource);
-		sqlSessionFactoryBean.setConfiguration(properties.getConfiguration());
-//		sqlSessionFactoryBean.setTypeHandlersPackage("com.example.demo.config.mybatis.handler.*");
-		sqlSessionFactoryBean.setPlugins(new StatementInterceptor(), new QueryInterceptor());
-		return sqlSessionFactoryBean.getObject();
-	}
+  
+  @Bean
+  public SqlSessionFactory sqlSessionFactory(DataSource dataSource, MybatisProperties properties)
+      throws Exception {
+    SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+    sqlSessionFactoryBean.setDataSource(dataSource);
+    sqlSessionFactoryBean.setConfiguration(properties.getConfiguration());
+    // sqlSessionFactoryBean.setTypeHandlersPackage("com.example.demo.config.mybatis.handler.*");
+    sqlSessionFactoryBean.setPlugins(new StatementInterceptor(), new QueryInterceptor());
+    return sqlSessionFactoryBean.getObject();
+  }
 
-	@Bean
-	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
-		return new SqlSessionTemplate(sqlSessionFactory);
-	}
+  @Bean
+  public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+    return new SqlSessionTemplate(sqlSessionFactory);
+  }
 }
