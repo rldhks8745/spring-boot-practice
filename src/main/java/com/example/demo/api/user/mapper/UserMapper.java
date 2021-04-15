@@ -3,9 +3,7 @@ package com.example.demo.api.user.mapper;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.session.RowBounds;
 import com.example.demo.api.user.model.User;
 import com.example.demo.api.user.model.UserRequest;
 import com.example.demo.config.mybatis.model.PagableResponse;
@@ -13,7 +11,6 @@ import com.example.demo.config.mybatis.model.PagableResponse;
 @Mapper
 public interface UserMapper {
 
-  @ResultType(value = List.class)
   @Select(value = """
           <script>
             SELECT * FROM USER
@@ -24,17 +21,17 @@ public interface UserMapper {
           </script>
       """)
   public PagableResponse<User> selectUserList(UserRequest userRequest);
-  
+
   @Select(value = """
-      <script>
-        SELECT * FROM USER
-        WHERE 1 = 1
-        <if test='id != null and !id.equals("")'>
-          AND ID LIKE '%${id}%'
-        </if>
-      </script>
-  """)
-public List<User> selectUserList2(UserRequest userRequest);
+          <script>
+            SELECT * FROM USER
+            WHERE 1 = 1
+            <if test='id != null and !id.equals("")'>
+              AND ID LIKE '%${id}%'
+            </if>
+          </script>
+      """)
+  public List<User> selectUserList2(UserRequest userRequest);
 
   @Select(value = """
       SELECT * FROM USER
