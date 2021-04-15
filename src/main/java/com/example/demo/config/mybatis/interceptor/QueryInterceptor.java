@@ -38,7 +38,7 @@ public class QueryInterceptor implements Interceptor {
        ms.getSqlSource(), ms.getSqlCommandType())
        .resource(ms.getResource())
        .parameterMap(ms.getParameterMap())
-       .resultMaps(countResultMaps)
+       .resultMaps(countResultMaps) 
        .fetchSize(ms.getFetchSize())
        .timeout(ms.getTimeout())
        .statementType(ms.getStatementType())
@@ -66,10 +66,13 @@ public class QueryInterceptor implements Interceptor {
     return pagableResponse;
   }
   
+  @SuppressWarnings("unchecked")
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
     try {
       PageInfo pageInfo = (PageInfo) invocation.getArgs()[2];
+      
+      log.debug("■■ QueryInterceptor intercept: Request Parameter가 PageInfo.class를 상속■■");
 
       MappedStatement oldMappedStatement = (MappedStatement) invocation.getArgs()[0];
       MappedStatement newMappedStatement = createCountMappedStatement(oldMappedStatement);
@@ -84,9 +87,7 @@ public class QueryInterceptor implements Interceptor {
       List<Object> list = (List<Object>) invocation.proceed();
 
       return createPagableResponse(list, pageInfo);
-    } catch (ClassCastException e) {
-      log.debug("■■ QueryInterceptor Skip: Request Parameter가 PageInfo.class를 상속받지 않았습니다.■■");
-    }
+    } catch (ClassCastException e) {}
 
     return invocation.proceed();
   }
