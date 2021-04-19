@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserRequest extends PageInfo {
+public class UserSearch extends PageInfo {
 
   private String id;
   

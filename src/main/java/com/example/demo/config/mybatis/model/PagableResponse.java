@@ -33,6 +33,9 @@ public class PagableResponse<T> implements List<T> {
     pageInfo = new PageInfo();
   }
   
+  /*
+   * 아래는 List Method Override 
+   */
   @Override
   public int size() {
     return list.size();
