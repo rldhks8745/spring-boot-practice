@@ -7,4 +7,4 @@
 	- Gradle 6.8.3
 	
 # Mybatis Interceptor 자동 Paging처리 사용방법
-Link: [Notion](https://www.notion.so/Mybatis-Interceptor-Paging-54ef31a3d0ab46cea8d8eec761da9bd2, "notion 링크")
+Link: [Notion](https://www.notion.so/Mybatis-Interceptor-Paging-54ef31a3d0ab46cea8d8eec761da9bd2)
