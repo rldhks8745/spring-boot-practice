@@ -15,26 +15,54 @@ import com.example.demo.config.mybatis.model.PagableResponse;
 import com.example.demo.config.mybatis.model.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
+
+/**
+ * @Package : com.example.demo.config.mybatis.interceptor
+ * @FileName : QueryInterceptor.java
+ * @CreateDate : 2021. 4. 19. 
+ * @author : Morian
+ * @Description : Mybatis가 Interceptor를 상속받은 @Component에 대해서 AutoConfiguration을 해준다.
+ * 
+ */
+ 
 @Slf4j
 @Intercepts({@Signature(type = Executor.class, method = "query",
     args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
 public class QueryInterceptor implements Interceptor {
 
+  private static String COUNT_ID_SUFFIX = "-Long";
+  
+  /**
+   * @Method : createCountResultMaps
+   * @CreateDate : 2021. 4. 19. 
+   * @param ms
+   * @return
+   * @Description : COUNT QUERY 결과를 받기위한 ResultMaps 생성
+   */
   private List<ResultMap> createCountResultMaps(MappedStatement ms) {
     List<ResultMap> countResultMaps = new ArrayList<>();
     
     ResultMap countResultMap =
-        new ResultMap.Builder(ms.getConfiguration(), ms.getId()+"-Long", Long.class, new ArrayList<>())
+        new ResultMap.Builder(ms.getConfiguration(), ms.getId() + COUNT_ID_SUFFIX, Long.class, new ArrayList<>())
             .build();
     countResultMaps.add(countResultMap);
     
     return countResultMaps;
   }
 
+  
+  /**
+   * @Method : createCountMappedStatement
+   * @CreateDate : 2021. 4. 19. 
+   * @param ms
+   * @return
+   * @Description : COUNT QUERY 결과를 받기위한 MappedStatement 생성
+   *                속도문제로 개선필요 시 간단히 Map으로 캐싱처리해도 될듯
+   */
   private MappedStatement createCountMappedStatement(MappedStatement ms) {
     List<ResultMap> countResultMaps = createCountResultMaps(ms);
     
-     return new MappedStatement.Builder(ms.getConfiguration(), ms.getId()+"-Long",
+     return new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + COUNT_ID_SUFFIX,
        ms.getSqlSource(), ms.getSqlCommandType())
        .resource(ms.getResource())
        .parameterMap(ms.getParameterMap())
@@ -45,7 +73,7 @@ public class QueryInterceptor implements Interceptor {
        .resultSetType(ms.getResultSetType())
        .cache(ms.getCache())
        .flushCacheRequired(ms.isFlushCacheRequired())
-       .useCache(false) // Custom하게 만든거라 cache는 false
+       .useCache(true)
        .resultOrdered(ms.isResultOrdered())
        .keyGenerator(ms.getKeyGenerator())
        .keyColumn(ms.getKeyColumns() != null ? String.join(",", ms.getKeyColumns()) : null)
@@ -56,6 +84,15 @@ public class QueryInterceptor implements Interceptor {
      .build();
   }
   
+  
+  /**
+   * @Method : createPagableResponse
+   * @CreateDate : 2021. 4. 19. 
+   * @param list
+   * @param pageInfo
+   * @return
+   * @Description : 최종적으로 return할 PagableResponse 생성
+   */
   private PagableResponse<Object> createPagableResponse(List<Object> list, PageInfo pageInfo) {
     PagableResponse<Object> pagableResponse = new PagableResponse<>();
     pagableResponse.setList(list);
@@ -72,7 +109,7 @@ public class QueryInterceptor implements Interceptor {
     try {
       PageInfo pageInfo = (PageInfo) invocation.getArgs()[2];
       
-      log.debug("■■ QueryInterceptor intercept: Request Parameter가 PageInfo.class를 상속■■");
+      log.debug("■■ QueryInterceptor intercept: Request Parameter가 PageInfo.class를 상속 ■■");
 
       MappedStatement oldMappedStatement = (MappedStatement) invocation.getArgs()[0];
       MappedStatement newMappedStatement = createCountMappedStatement(oldMappedStatement);
