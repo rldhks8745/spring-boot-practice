@@ -1,6 +1,5 @@
 package com.example.demo.config.mybatis.model;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import org.apache.ibatis.session.RowBounds;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -23,10 +22,10 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties({"offset", "limit"})
 public class PageInfo extends RowBounds {
   
-  protected Integer page = 1;
+  protected Integer page;
 
   @Min(1)
-  protected Integer size = 10;
+  protected Integer size;
 
   protected Long totalCount = -1L; // set이 되지않았다는 의미로 -1
 }
