@@ -1,5 +1,6 @@
 package com.example.demo.api.user.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class UserServiceTests {
     PagableResponse<User> returnObject = userMapper.selectUserList(userSearch);
     log.debug("list: "+returnObject.getList().toString());
     log.debug("pageInfo: "+returnObject.getPageInfo().toString());
+    
+    assertThat(returnObject.getList().size()).isEqualTo(2);
+    assertThat(returnObject.getPageInfo().getTotalCount()).isEqualTo(3);
     log.debug("■■■ selectUserListTestWithPageAndSize End ■■■■");
   }
 
@@ -40,6 +44,10 @@ public class UserServiceTests {
     PagableResponse<User> returnObject = userMapper.selectUserList(userSearch);
     log.debug("list: "+returnObject.getList().toString());
     log.debug("pageInfo: "+returnObject.getPageInfo().toString());
+
+    assertThat(returnObject.getList().size()).isEqualTo(3);
+    assertThat(returnObject.getPageInfo().getPage()).isNull();
+    assertThat(returnObject.getPageInfo().getSize()).isNull();
     log.debug("■■■ selectUserListTestWithoutPageAndSize End ■■■■");
   }
 }
