@@ -13,8 +13,21 @@ public class UserService {
   @Autowired
   private UserMapper userMapper;
 
-  public PagableResponse<User> selectUserList(UserSearch userSearch) {
-    PagableResponse<User> p = userMapper.selectUserList(userSearch);
-    return p;
+  public PagableResponse<User> selectListUser(UserSearch userSearch) {
+    return userMapper.selectListUser(userSearch);
+  }
+  
+  public User selectOneUser(Long num) {
+    return userMapper.selectOneUser(num);
+  }
+
+  public Long insertUser(User user) {
+    return userMapper.insertUser(user);
+  }
+
+  public void updateUser(User user) throws Exception {
+    Long updatedCount = userMapper.updateUser(user);
+    if(updatedCount <= 0)
+      throw new Exception("is not updated");
   }
 }
