@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
  * @CreateDate : 2021. 4. 19. 
  * @author : Morian
  * @Description : Mybatis가 Interceptor를 상속받은 @Component에 대해서 AutoConfiguration을 해준다.
+ * SELECT 쿼리에만 작동하는 것으로 확인
  * 
  */
  
@@ -111,16 +112,16 @@ public class QueryInterceptor implements Interceptor {
       
       log.debug("■■ QueryInterceptor intercept: Request Parameter가 PageInfo.class를 상속 ■■");
 
-      MappedStatement oldMappedStatement = (MappedStatement) invocation.getArgs()[0];
-      MappedStatement newMappedStatement = createCountMappedStatement(oldMappedStatement);
+      MappedStatement originalMappedStatement = (MappedStatement) invocation.getArgs()[0];
+      MappedStatement countMappedStatement = createCountMappedStatement(originalMappedStatement);
       
       // COUNT 구하기
-      invocation.getArgs()[0] = newMappedStatement;
-      List<Number> totalCount = (List<Number>) invocation.proceed();
+      invocation.getArgs()[0] = countMappedStatement;
+      List<Long> totalCount = (List<Long>) invocation.proceed();
       pageInfo.setTotalCount((Long) totalCount.get(0));
 
       // LIST 구하기
-      invocation.getArgs()[0] = oldMappedStatement;
+      invocation.getArgs()[0] = originalMappedStatement;
       List<Object> list = (List<Object>) invocation.proceed();
 
       return createPagableResponse(list, pageInfo);
