@@ -23,6 +23,10 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
 
   implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.4'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz', version: '2.4.4'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.4'
+  
+  
   implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
 
   implementation 'org.springframework.boot:spring-boot-starter-validation'
